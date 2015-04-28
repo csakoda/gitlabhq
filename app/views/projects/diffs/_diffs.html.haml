@@ -9,7 +9,7 @@
   = render 'projects/diffs/warning', diffs: diffs
 
 .files
-  - safe_diff_files(diffs).each_with_index do |diff_file, index|
+  - safe_diff_files(diffs, project).each_with_index do |diff_file, index|
     = render 'projects/diffs/file', diff_file: diff_file, i: index, project: project
 
 - if @diff_timeout

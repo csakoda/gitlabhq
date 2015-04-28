@@ -7,9 +7,15 @@ module DiffHelper
     end
   end
 
-  def safe_diff_files(diffs)
-    diffs.first(allowed_diff_size).map do |diff|
-      Gitlab::Diff::File.new(diff)
+  def safe_diff_files(diffs, project)
+    if project.merge_filters.nil? || project.merge_filters.empty?
+      diffs.first(allowed_diff_size).map do |diff|
+        Gitlab::Diff::File.new(diff)
+      end
+    else
+      diffs.select{ |diff| diff.new_path.starts_with?(project.merge_filters) == false}.first(allowed_diff_size).map do |diff|
+        Gitlab::Diff::File.new(diff)
+      end
     end
   end
 
