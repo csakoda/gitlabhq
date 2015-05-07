@@ -127,7 +127,7 @@ class MergeRequestDiff < ActiveRecord::Base
         new_diffs = []
       end
 
-      if new_diffs.sum { |diff| diff.diff.lines.count } > Commit::DIFF_HARD_LIMIT_LINES
+      if new_diffs.select{ |diff| diff.new_path.starts_with?(merge_request.target_project.merge_filters) == false}.sum { |diff| diff.diff.lines.count } > Commit::DIFF_HARD_LIMIT_LINES
         self.state = :overflow_diff_lines_limit
         new_diffs = []
       end
