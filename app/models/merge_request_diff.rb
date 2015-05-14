@@ -126,10 +126,16 @@ class MergeRequestDiff < ActiveRecord::Base
         self.state = :overflow_diff_files_limit
         new_diffs = []
       end
-
-      if new_diffs.select{ |diff| diff.new_path.starts_with?(merge_request.target_project.merge_filters) == false}.sum { |diff| diff.diff.lines.count } > Commit::DIFF_HARD_LIMIT_LINES
-        self.state = :overflow_diff_lines_limit
-        new_diffs = []
+      if merge_request.target_project.merge_filters.nil? || merge_request.target_project.merge_filters.empty?
+        if new_diffs.sum { |diff| diff.diff.lines.count } > Commit::DIFF_HARD_LIMIT_LINES
+          self.state = :overflow_diff_lines_limit
+          new_diffs = []
+        end
+      else
+        if new_diffs.select{ |diff| diff.new_path.starts_with?(merge_request.target_project.merge_filters) == false}.sum { |diff| diff.diff.lines.count } > Commit::DIFF_HARD_LIMIT_LINES
+          self.state = :overflow_diff_lines_limit
+          new_diffs = []
+        end
       end
     end
 
